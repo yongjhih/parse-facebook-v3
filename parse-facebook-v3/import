@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+zip_dir=../../parse-android-sdk
+
+for version in 1.8.4 1.9.0 1.9.1 1.9.2; do
+    echo "$version"
+
+    zip="${zip_dir}/Parse-${version}.zip"
+    echo "$zip"
+
+    [ -f "$zip" ] || continue
+
+    git rm -fr libs
+    rm -fr libs
+
+    mkdir libs
+
+    pushd libs
+
+        unzip "../${zip}"
+
+        #javadoc_dir="ParseFacebookUtilsV3-${version}-javadoc"
+        #javadoc="${javadoc_dir}.jar"
+
+        #if [ -d "$javadoc_dir" ]; then
+        #    pushd "$javadoc_dir"
+        #        zip -r "../${javadoc}" .
+        #    popd
+        #    git add "$javadoc"
+        #fi
+
+        jar="ParseFacebookUtilsV3-${version}.jar"
+
+        if [ -f "$jar" ]; then
+            git add "$jar"
+        fi
+
+        git commit -m "import ${version}"
+        git tag "$version" -f
+        git push origin "$version" -f
+
+    popd
+done
+
+git push origin master -f
